@@ -31,5 +31,26 @@ namespace SL.Controllers
                 return BadRequest(result);
             }
         }
+        [HttpPost]
+        [Route("/Employe/Add")]
+        public IActionResult Add(ML.Employe employe)
+        {
+            var result = BL.Employe.AddEmploye(employe);
+
+            var response = new DTO.ResultEmploye
+            {
+                Success = result.Item1,
+                Message = result.Item2,
+                Exception = result.Item3
+            };
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response);
+            }
+        }
     }
 }
