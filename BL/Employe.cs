@@ -114,25 +114,36 @@ namespace BL
         }
         public static (bool,string,ML.Employe, Exception) ById(int EmployeeId)
 		{
-			ML.Employe employe = new ML.Employe();
 			try
 			{
 				using (DL.MfloresPagaTodoContext context = new DL.MfloresPagaTodoContext())
 				{
-                    var query = context.Employees.FromSqlRaw($"EXECUTE ByIdEmploye '{EmployeeId}'").FirstOrDefault();
+					var query = (from employ in context.Employees
+								 where employ.EmployeeId == EmployeeId
+								 select new
+								 {
+									 EmployeeId = employ.EmployeeId,
+									 FirstName = employ.FirstName,
+									 LastName = employ.LastName,
+									 Salary = employ.Salary
+								 }).FirstOrDefault();//context.Employees.FromSql($"EXECUTE dbo.ByIdEmploye {EmployeeId}").FirstOrDefault();
 
 					if (query != null)
 					{
-						employe.EmployeeId = query.EmployeeId;
-						employe.FirstName = query.FirstName;
-						employe.LastName = query.LastName;
-						employe.Salary = query.Salary.Value;
+						ML.Employe employe = new ML.Employe
+						{
+
+							EmployeeId = query.EmployeeId,
+							FirstName = query.FirstName,
+							LastName = query.LastName,
+							Salary = query.Salary.Value
+						};
 
 						return (true, null, employe, null);
 					}
 					else
 					{
-						return (false,null,employe,null);
+						return (false,null,null,null);
 					}
                 }
 			}
